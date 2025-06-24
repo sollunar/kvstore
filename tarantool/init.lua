@@ -3,7 +3,7 @@ box.cfg {
 }
 
 box.once("schema", function()
-  box.schema.space.create("kv")
+  box.schema.space.create("kvstore")
   box.space.kv:format({
     { name = "key",   type = "string" },
     { name = "value", type = "string" }

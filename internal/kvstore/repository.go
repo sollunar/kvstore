@@ -1,6 +1,8 @@
 package kvstore
 
 import (
+	"fmt"
+
 	"github.com/sollunar/kvstore-api/pkg/storage"
 	"github.com/tarantool/go-tarantool/v2"
 )
@@ -31,6 +33,8 @@ func (s *KVStore) Set(key, value string) error {
 	_, err := s.Conn.Do(
 		tarantool.NewUpsertRequest("kvstore").Tuple([]interface{}{key, value}).Operations(tarantool.NewOperations().Assign(1, value)),
 	).Get()
+
+	fmt.Println(err.Error())
 
 	return err
 }
