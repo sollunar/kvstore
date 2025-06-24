@@ -9,6 +9,7 @@ import (
 	"github.com/sollunar/kvstore-api/internal/kvstore"
 	"github.com/sollunar/kvstore-api/pkg/storage"
 	"github.com/swaggo/http-swagger"
+	"go.uber.org/zap"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,8 +20,9 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func App(config *configs.Config) http.Handler {
 	store := storage.NewTarantoolStorage(config.TT.Host, config.TT.Port)
 	router := http.NewServeMux()
+	logger, _ := zap.NewProduction()
 
-	kvRepository := kvstore.NewKVRepository(store)
+	kvRepository := kvstore.NewKVRepository(store, logger)
 	kvservice := kvstore.NewKVService(kvRepository)
 	kvstore.NewKVStoreHandler(router, kvservice)
 
