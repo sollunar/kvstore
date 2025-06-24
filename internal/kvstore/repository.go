@@ -2,7 +2,7 @@ package kvstore
 
 import (
 	"github.com/sollunar/kvstore-api/pkg/storage"
-	"github.com/tarantool/go-tarantool"
+	"github.com/tarantool/go-tarantool/v2"
 )
 
 type KVStore struct {
@@ -16,22 +16,34 @@ func NewKVRepository(storage *storage.TarantoolStorage) *KVStore {
 }
 
 func (s *KVStore) Get(key string) (string, error) {
-	resp, err := s.Conn.Select("kv", "primary", 0, 1, tarantool.IterEq, []any{key})
-	if err != nil || len(resp.Data) == 0 {
+	data, err := s.Conn.Do(
+		tarantool.NewSelectRequest("kvstore").Key([]interface{}{key}),
+	).Get()
+
+	if err != nil || len(data) == 0 {
 		return "", ErrKeyNotFound
 	}
-	return resp.Data[0].([]any)[1].(string), nil
+
+	return data[0].([]interface{})[1].(string), nil
 }
 
 func (s *KVStore) Set(key, value string) error {
-	_, err := s.Conn.Replace("kv", []any{key, value})
+	_, err := s.Conn.Do(
+		tarantool.NewUpsertRequest("kvstore").Tuple([]interface{}{key, value}).Operations(tarantool.NewOperations().Assign(1, value)),
+	).Get()
+
 	return err
 }
 
 func (s *KVStore) Delete(key string) error {
-	resp, err := s.Conn.Delete("kv", "primary", []any{key})
-	if err != nil || len(resp.Data) == 0 {
+
+	data, err := s.Conn.Do(
+		tarantool.NewDeleteRequest("kvstore").Key([]interface{}{key}),
+	).Get()
+
+	if err != nil || len(data) == 0 {
 		return ErrKeyNotFound
 	}
+
 	return nil
 }
