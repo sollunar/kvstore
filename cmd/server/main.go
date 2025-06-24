@@ -59,7 +59,7 @@ func main() {
 
 	go func() {
 		log.Println("pprof listening on :6060")
-		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
+		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("pprof server failed: %v", err)
 		}
 	}()
