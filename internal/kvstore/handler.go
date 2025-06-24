@@ -44,7 +44,7 @@ func (h *KVStoreHandler) Get(w http.ResponseWriter, r *http.Request) {
 	val, err := h.kvservice.Get(key)
 	if err != nil {
 		if errors.Is(err, ErrKeyNotFound) {
-			http.Error(w, "key not found", http.StatusNotFound)
+			res.Error(w, "key not found", http.StatusNotFound)
 			return
 		}
 		res.Error(w, "internal server error", http.StatusInternalServerError)
