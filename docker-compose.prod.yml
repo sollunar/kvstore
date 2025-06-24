@@ -24,6 +24,7 @@ services:
       TARANTOOL_HOST: tarantool
       TARANTOOL_PORT: "3301"
       APP_ENV: production
+      SERVER_PORT: 80
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
