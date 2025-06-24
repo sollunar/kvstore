@@ -10,16 +10,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sollunar/kvstore-api/mock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
-func bootstrap(t *testing.T) (*Handler, *mock.MockStorage, *gomock.Controller) {
+func bootstrap(t *testing.T) (*KVStoreHandler, *MockStorage, *gomock.Controller) {
 	ctrl := gomock.NewController(t)
-	mockStore := mock.NewMockStorage(ctrl)
+	mockStore := NewMockStorage(ctrl)
 	kvService := NewKVService(mockStore)
-	h := &Handler{kvservice: kvService}
+	h := &KVStoreHandler{kvservice: kvService}
 	return h, mockStore, ctrl
 }
 
@@ -30,13 +29,13 @@ func TestGetHandler(t *testing.T) {
 	testCases := []struct {
 		name          string
 		key           string
-		buildStubs    func(mockStore *mock.MockStorage)
+		buildStubs    func(mockStore *MockStorage)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			key:  randKey,
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Get(randKey).
 					Times(1).
@@ -45,7 +44,7 @@ func TestGetHandler(t *testing.T) {
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 
-				var body SetRequest
+				var body GetResponse
 				err := json.NewDecoder(recorder.Body).Decode(&body)
 				require.NoError(t, err)
 				require.Equal(t, randKey, body.Key)
@@ -55,7 +54,7 @@ func TestGetHandler(t *testing.T) {
 		{
 			name: "NOT_FOUND",
 			key:  "missing",
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Get("missing").
 					Times(1).
@@ -66,9 +65,10 @@ func TestGetHandler(t *testing.T) {
 			},
 		},
 		{
-			name:       "BAD_REQUEST_EMPTY_KEY",
-			key:        "",
-			buildStubs: func(store *mock.MockStorage) {},
+			name: "BAD_REQUEST_EMPTY_KEY",
+			key:  "",
+			buildStubs: func(store *MockStorage) {
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
@@ -98,13 +98,13 @@ func TestSetHandler(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(mockStore *mock.MockStorage)
+		buildStubs    func(mockStore *MockStorage)
 		checkResponse func(t *testing.T, rec *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			body: fmt.Sprintf(`{"key": "%s", "value": "%s"}`, randKey, randValue),
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Set(randKey, randValue).
 					Times(1).
@@ -117,7 +117,7 @@ func TestSetHandler(t *testing.T) {
 		{
 			name: "BAD_REQUEST_INVALID_JSON",
 			body: `invalid-json`,
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().Set(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -127,7 +127,7 @@ func TestSetHandler(t *testing.T) {
 		{
 			name: "BAD_REQUEST_KEY_OR_VALUE",
 			body: fmt.Sprintf(`{"key": "", "value": "%s"}`, randValue),
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().Set(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -137,7 +137,7 @@ func TestSetHandler(t *testing.T) {
 		{
 			name: "INTERNAL_ERROR",
 			body: fmt.Sprintf(`{"key": "%s", "value": "%s"}`, randKey, randValue),
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Set(randKey, randValue).
 					Times(1).
@@ -172,13 +172,13 @@ func TestDeleteKeyRequest(t *testing.T) {
 	testCases := []struct {
 		name          string
 		key           string
-		buildStubs    func(mockStore *mock.MockStorage)
+		buildStubs    func(mockStore *MockStorage)
 		checkResponse func(t *testing.T, rec *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			key:  randKey,
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Delete(randKey).
 					Times(1).
@@ -191,7 +191,7 @@ func TestDeleteKeyRequest(t *testing.T) {
 		{
 			name: "NOT_FOUND",
 			key:  randKey,
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Delete(randKey).
 					Times(1).
@@ -204,7 +204,7 @@ func TestDeleteKeyRequest(t *testing.T) {
 		{
 			name: "BAD_REQUEST_EMPTY_KEY",
 			key:  "",
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().Delete(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -214,7 +214,7 @@ func TestDeleteKeyRequest(t *testing.T) {
 		{
 			name: "INTERNAL_ERROR",
 			key:  randKey,
-			buildStubs: func(store *mock.MockStorage) {
+			buildStubs: func(store *MockStorage) {
 				store.EXPECT().
 					Delete(randKey).
 					Times(1).

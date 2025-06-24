@@ -1,0 +1,118 @@
+definitions:
+  kvstore.GetResponse:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  kvstore.SetRequest:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - value
+    type: object
+info:
+  contact: {}
+paths:
+  /delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a key-value entry by key
+      parameters:
+      - description: Key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Key not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Delete key
+      tags:
+      - kvstore
+  /get:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the value for a given key
+      parameters:
+      - description: Key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kvstore.GetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Key not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get value by key
+      tags:
+      - kvstore
+  /set:
+    post:
+      consumes:
+      - application/json
+      description: Store a key-value entry in the store
+      parameters:
+      - description: Key-Value Pair
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/kvstore.SetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Set a key-value pair
+      tags:
+      - kvstore
+swagger: "2.0"

@@ -1,9 +1,9 @@
-FROM golang:1.24.4
+FROM golang:1.24.4 AS builder
 
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y libssl-dev pkg-config && \
+    apt-get install -y libssl-dev pkg-config build-essential && \
     apt-get clean
 
 COPY go.mod go.sum ./
@@ -13,4 +13,15 @@ COPY . .
 
 RUN go build -o kvstore-api ./cmd/server
 
-CMD [ "./kvstore-api" ]
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y libssl3 && \
+    apt-get clean
+
+COPY --from=builder /app/kvstore-api .
+
+CMD ["./kvstore-api"]
+

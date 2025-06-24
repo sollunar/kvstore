@@ -10,5 +10,7 @@ restart:
 test:
 	go test -v -cover ./...
 
+swag:
+	swag init -g cmd/server/main.go
 
-.PHONY: up down restart test
+.PHONY: up down restart test swag

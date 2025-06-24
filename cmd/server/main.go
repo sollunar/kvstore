@@ -5,8 +5,10 @@ import (
 	"net/http"
 
 	"github.com/sollunar/kvstore-api/configs"
+	_ "github.com/sollunar/kvstore-api/docs"
 	"github.com/sollunar/kvstore-api/internal/kvstore"
 	"github.com/sollunar/kvstore-api/pkg/storage"
+	"github.com/swaggo/http-swagger"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,9 +22,11 @@ func App(config *configs.Config) http.Handler {
 
 	kvRepository := kvstore.NewKVRepository(store)
 	kvservice := kvstore.NewKVService(kvRepository)
-	kvstore.NewHandler(router, kvservice)
+	kvstore.NewKVStoreHandler(router, kvservice)
 
 	router.HandleFunc("/health", healthHandler)
+
+	router.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	return router
 }

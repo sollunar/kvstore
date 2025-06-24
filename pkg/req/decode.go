@@ -11,5 +11,6 @@ func Decode[T any](body io.ReadCloser) (T, error) {
 	if err != nil {
 		return payload, err
 	}
+	defer body.Close()
 	return payload, nil
 }
