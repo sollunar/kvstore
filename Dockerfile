@@ -11,6 +11,10 @@ RUN go mod download
 
 COPY . .
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+RUN swag init -g ./cmd/server/main.go
+
 RUN go build -o kvstore-api ./cmd/server
 
 FROM debian:bookworm-slim
@@ -22,6 +26,8 @@ RUN apt-get update && \
     apt-get clean
 
 COPY --from=builder /app/kvstore-api .
+
+COPY --from=builder /app/docs ./docs
 
 CMD ["./kvstore-api"]
 
