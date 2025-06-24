@@ -1,0 +1,36 @@
+services:
+  tarantool:
+    image: tarantool/tarantool:3.4
+    container_name: tarantool
+    command: tarantool /opt/tarantool/init.lua
+    volumes:
+      - ./tarantool/init.lua:/opt/tarantool/init.lua
+    ports:
+      - "3301:3301"
+    networks:
+      - api-network
+
+  api:
+    build: .
+    container_name: api
+    ports:
+      - "8080:8080"
+    depends_on:
+      tarantool:
+        condition: service_healthy
+    networks:
+      - api-network
+    environment:
+      - TARANTOOL_HOST=tarantool
+      - TARANTOOL_PORT=3301
+      - APP_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+networks:
+  api-network:
+    driver: bridge
