@@ -4,11 +4,11 @@ box.cfg {
 
 box.once("schema", function()
   box.schema.space.create("kvstore")
-  box.space.kv:format({
+  box.space.kvstore:format({
     { name = "key",   type = "string" },
     { name = "value", type = "string" }
   })
-  box.space.kv:create_index("primary", {
+  box.space.kvstore:create_index("primary", {
     parts = { "key" }
   })
 end)
