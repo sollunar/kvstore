@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -56,13 +55,6 @@ func main() {
 		IdleTimeout:    120 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-
-	go func() {
-		log.Println("pprof listening on :6060")
-		if err := http.ListenAndServe(":6060", nil); err != nil {
-			log.Fatalf("pprof server failed: %v", err)
-		}
-	}()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
