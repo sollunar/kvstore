@@ -8,7 +8,7 @@ import (
 const (
 	defaultTTHost     = "localhost"
 	defaultTTPort     = "3301"
-	defaultServerPort = "8080"
+	defaultServerPort = "80"
 
 	envTTHost     = "TARANTOOL_HOST"
 	envTTPort     = "TARANTOOL_PORT"

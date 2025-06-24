@@ -40,7 +40,7 @@ func main() {
 		Handler: app,
 	}
 
-	log.Println("Server running at :8080")
+	log.Printf("Server running at :%s\n", config.Server.Port)
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Server failed: %v", err)
