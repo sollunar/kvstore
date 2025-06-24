@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/delete": {
+        "/api/v1/delete": {
             "delete": {
                 "description": "Delete a key-value entry by key",
                 "consumes": [
@@ -65,7 +65,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get": {
+        "/api/v1/get": {
             "get": {
                 "description": "Retrieve the value for a given key",
                 "consumes": [
@@ -115,7 +115,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/set": {
+        "/api/v1/set": {
             "post": {
                 "description": "Store a key-value entry in the store",
                 "consumes": [

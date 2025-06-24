@@ -12,13 +12,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 )
 
 func bootstrap(t *testing.T) (*KVStoreHandler, *MockStorage, *gomock.Controller) {
 	ctrl := gomock.NewController(t)
 	mockStore := NewMockStorage(ctrl)
 	kvService := NewKVService(mockStore)
-	h := &KVStoreHandler{kvservice: kvService}
+	logger := zap.NewNop()
+
+	h := &KVStoreHandler{kvservice: kvService, log: logger}
 	return h, mockStore, ctrl
 }
 

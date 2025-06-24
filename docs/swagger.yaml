@@ -19,7 +19,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /delete:
+  /api/v1/delete:
     delete:
       consumes:
       - application/json
@@ -52,7 +52,7 @@ paths:
       summary: Delete key
       tags:
       - kvstore
-  /get:
+  /api/v1/get:
     get:
       consumes:
       - application/json
@@ -85,7 +85,7 @@ paths:
       summary: Get value by key
       tags:
       - kvstore
-  /set:
+  /api/v1/set:
     post:
       consumes:
       - application/json

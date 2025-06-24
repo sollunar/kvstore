@@ -27,7 +27,7 @@ func (s *KVStore) Get(key string) (string, error) {
 
 	if err != nil {
 		s.log.Error("GET failed", zap.String("key", key), zap.Error(err))
-		return "", ErrKeyNotFound
+		return "", ErrInternal
 	}
 
 	if len(data) == 0 {
@@ -72,7 +72,7 @@ func (s *KVStore) Delete(key string) error {
 
 	if err != nil {
 		s.log.Error("DELETE failed", zap.String("key", key), zap.Error(err))
-		return ErrKeyNotFound
+		return ErrInternal
 	}
 
 	if len(data) == 0 {
